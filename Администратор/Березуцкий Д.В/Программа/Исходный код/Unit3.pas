@@ -1,0 +1,144 @@
+unit Unit3;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, DB, ADODB, Grids,
+  DBGrids, ExtCtrls, StdCtrls, ActnList,
+  Buttons, ButtonGroup, DBCtrls, ExtDlgs, Menus, jpeg,
+  ImgList, ComCtrls, ToolWin, ComObj;
+
+type
+  TForm3 = class(TForm)
+    GroupBox1: TGroupBox;
+    GroupBox4: TGroupBox;
+    Label8: TLabel;
+    ComboBox1: TComboBox;
+    Label10: TLabel;
+    ComboBox2: TComboBox;
+    Label1: TLabel;
+    ComboBox3: TComboBox;
+    BitBtn4: TBitBtn;
+    BitBtn2: TBitBtn;
+    BitBtn6: TBitBtn;
+    procedure BitBtn2Click(Sender: TObject);
+    procedure BitBtn4Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure BitBtn6Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form3: TForm3;
+  Filtr: boolean;
+
+implementation
+
+{$R *.dfm}
+
+uses Unit1;
+
+procedure TForm3.BitBtn2Click(Sender: TObject);
+begin
+  Form3.Close;
+end;
+
+procedure TForm3.BitBtn4Click(Sender: TObject);
+var
+query:string;
+begin
+  if Filtr = true then
+  begin
+    with Form1.ADOQuery1 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1');
+      Open;
+      Filtr:= false;
+    end;
+  end;
+  query:= '';
+  if ComboBox1.Text <> '' then
+  begin
+    if query <> '' then query:= query+' AND Класс = '''+ComboBox1.Text+''''
+    else query:= query+'Класс = '''+ComboBox1.Text+'''';
+  end;
+  if ComboBox2.Text <> '' then
+  begin
+    if query <> '' then query:= query+' AND Пол =  '''+ComboBox2.Text+''''
+    else query:= query+'Пол = '''+ComboBox2.Text+'''';
+  end;
+    if ComboBox3.Text <> '' then
+  begin
+    if query <> '' then query:= query+' AND Буква = '''+ComboBox3.Text+''''
+    else query:= query+'Буква = '''+ComboBox3.Text+'''';
+  end;
+  with Form1.ADOQuery1 do
+  begin
+    try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE '+query);
+      Open;
+    except
+      ShowMessage('Соотвествующих записей нет.');
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1');
+      Open;
+    end;
+  end;
+  Filtr:= true;
+end;
+
+procedure TForm3.BitBtn6Click(Sender: TObject);
+var XL:variant; iRow:integer;
+begin
+  try
+    Form1.ADOQuery1.First;
+    XL:=CreateOleObject('Excel.Application');
+    XL.ReferenceStyle:=2;
+    XL.Workbooks.add(getcurrentdir()+'/отчет.xls');
+    XL.cells[1,1]:='Класс';
+    XL.cells[1,2]:='Буква';
+    XL.cells[1,3]:='Фамилия';
+    XL.cells[1,4]:='Имя';
+    XL.cells[1,5]:='Отчество';
+    XL.cells[1,6]:='Пол';
+    XL.cells[1,7]:='Дата рождения';
+    iRow:=2;
+    while not Form1.ADOQuery1.Eof do
+      begin
+        XL.cells[irow,1]:=Form1.ADOQuery1.FieldByName('Класс').AsString;
+        XL.cells[irow,2]:=Form1.ADOQuery1.FieldByName('Буква').AsString;
+        XL.cells[irow,3]:=Form1.ADOQuery1.FieldByName('Фамилия').AsString;
+        XL.cells[irow,4]:=Form1.ADOQuery1.FieldByName('Имя').AsString;
+        XL.cells[irow,5]:=Form1.ADOQuery1.FieldByName('Отчество').AsString;
+        XL.cells[irow,6]:=Form1.ADOQuery1.FieldByName('Пол').AsString;
+        XL.cells[irow,7]:=Form1.ADOQuery1.FieldByName('Дат_рож').AsString;
+        inc(iRow);
+        Form1.ADOQuery1.Next();
+      end;
+        XL.visible:=true;
+  except
+    MessageBox(Handle,'Таблица пуста','Ошибка', MB_OK+MB_ICONERROR);
+  end;
+end;
+
+procedure TForm3.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  with Form1.ADOQuery1 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT * FROM tab1');
+    Open;
+  end;
+end;
+
+end.

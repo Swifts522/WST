@@ -1,0 +1,1036 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, DB, ADODB, Grids,
+  DBGrids, ExtCtrls, StdCtrls, ActnList,
+  Buttons, ButtonGroup, DBCtrls, ExtDlgs, Menus, jpeg,
+  ImgList, ComCtrls, ToolWin, ComObj, pngimage;
+
+type
+  TForm1 = class(TForm)
+    DBGrid1: TDBGrid;
+    ADOConnection1: TADOConnection;
+    ADOQuery1: TADOQuery;
+    DataSource1: TDataSource;
+    GroupBox1: TGroupBox;
+    Label1: TLabel;
+    Edit1: TEdit;
+    Label2: TLabel;
+    Edit4: TEdit;
+    GroupBox2: TGroupBox;
+    Label3: TLabel;
+    Edit5: TEdit;
+    Label4: TLabel;
+    Edit6: TEdit;
+    Label5: TLabel;
+    Edit7: TEdit;
+    Label6: TLabel;
+    Edit8: TEdit;
+    Label7: TLabel;
+    Edit9: TEdit;
+    DataSource2: TDataSource;
+    ADOQuery2: TADOQuery;
+    BitBtn1: TBitBtn;
+    BitBtn2: TBitBtn;
+    Edit2: TEdit;
+    Edit3: TEdit;
+    Label8: TLabel;
+    ComboBox1: TComboBox;
+    Label9: TLabel;
+    ComboBox2: TComboBox;
+    Label10: TLabel;
+    ComboBox3: TComboBox;
+    Label11: TLabel;
+    Edit10: TEdit;
+    GroupBox3: TGroupBox;
+    BitBtn3: TBitBtn;
+    BitBtn4: TBitBtn;
+    BitBtn5: TBitBtn;
+    MainMenu1: TMainMenu;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
+    N7: TMenuItem;
+    DBImage1: TDBImage;
+    OpenPictureDialog1: TOpenPictureDialog;
+    Button1: TButton;
+    Button2: TButton;
+    N8: TMenuItem;
+    N9: TMenuItem;
+    N10: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    ImageList1: TImageList;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
+    ToolButton6: TToolButton;
+    ToolButton7: TToolButton;
+    BitBtn7: TBitBtn;
+    DataSource3: TDataSource;
+    ADOQuery3: TADOQuery;
+    DBGrid2: TDBGrid;
+    ADOConnection2: TADOConnection;
+    Button3: TButton;
+    TreeView1: TTreeView;
+    Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
+    Image1: TImage;
+    Button7: TButton;
+    Edit11: TEdit;
+    procedure DataSource1DataChange(Sender: TObject; Field: TField);
+    procedure BitBtn2Click(Sender: TObject);
+    procedure BitBtn3Click(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
+    procedure DBGrid1TitleClick(Column: TColumn);
+    procedure BitBtn4Click(Sender: TObject);
+    procedure BitBtn5Click(Sender: TObject);
+    procedure N2Click(Sender: TObject);
+    procedure N3Click(Sender: TObject);
+    procedure N4Click(Sender: TObject);
+    procedure N6Click(Sender: TObject);
+    procedure Edit();
+    procedure Delete();
+    procedure N7Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure N9Click(Sender: TObject);
+    procedure N10Click(Sender: TObject);
+    procedure ToolButton1Click(Sender: TObject);
+    procedure ToolButton2Click(Sender: TObject);
+    procedure ToolButton3Click(Sender: TObject);
+    procedure ToolButton4Click(Sender: TObject);
+    procedure ToolButton5Click(Sender: TObject);
+    procedure ToolButton6Click(Sender: TObject);
+    procedure ToolButton7Click(Sender: TObject);
+    procedure BitBtn20Click(Sender: TObject);
+    procedure BitBtn7Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
+    procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
+    procedure ЗаданияClick(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Button7Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+uses Unit2, Unit3, Unit4, Unit5, Unit7, Unit9;
+
+var
+id:integer;
+s:string;
+Jpeg:TJPEGImage;
+k: bool;
+s1:string;
+
+procedure TForm1.Delete();
+var
+  ButtonSelect:Integer;
+begin
+  ButtonSelect:= MessageBox(handle, PChar('Вы точно хотите удалить?'),PChar('Удаление'), MB_ICONQUESTION+MB_YESNO+MB_DEFBUTTON2);
+  if ButtonSelect = idyes then
+  begin
+    with ADOQuery1 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add('DELETE FROM tab2 WHERE id = '+IntToStr(id));
+      ExecSQL;
+      Close;
+      sql.Clear;
+      sql.Add('DELETE FROM tab1 WHERE id_1 = '+IntToStr(id));
+      ExecSQL;
+    end;
+    with ADOQuery1 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1');
+      Open;
+    end;
+  end;
+end;
+
+procedure TForm1.Edit();
+var
+  bmp:TBitmap;
+begin
+  if k = true then
+  begin
+  jpeg:=TJPEGImage.Create;
+  bmp:=TBitmap.Create;
+  jpeg.LoadFromFile(OpenPictureDialog1.FileName);
+  bmp.Assign(jpeg);
+  ADOQuery1.Edit;
+  ADOQuery1.FieldByName('Foto').Assign(bmp);
+  ADOQuery1.Post;
+    //ADOQuery1.SQL.Clear;
+    //ADOQuery1.SQL.Add(' Update tab1 set foto = :img WHERE id_1 = '+IntToStr(id));
+    //ADOQuery1.Parameters.ParamByName('img').Assign(DBImage1.Picture.Graphic);
+    //ADOQuery1.ExecSQL;
+  end;
+  if DBImage1.Picture.Graphic = nil then
+  begin
+    ADOQuery1.Close;
+    ADOQuery1.sql.Clear;
+    ADOQuery1.sql.Add(' UPDATE tab1 set foto = "" WHERE id_1 = '+IntToStr(id));
+    ADOQuery1.ExecSQL;
+  end;
+  with ADOQuery1 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('UPDATE tab1 SET Класс = '''+ComboBox1.Text+''', Буква = '''+ComboBox2.Text+''', Фамилия = '''+Edit1.Text+''', Имя = '''+Edit2.Text+''', Отчество = '''+Edit3.Text+''', ');
+    sql.Add('Пол = '''+ComboBox3.Text+''', Дат_рож = '''+Edit10.Text+''' WHERE id_1 = '+IntToStr(id));
+    ExecSQL;
+  end;
+  with ADOQuery2 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('UPDATE tab2 SET Нац = '''+Edit4.Text+''', Адрес_ул = '''+Edit5.Text+''', Адрес_дом = '''+Edit6.Text+''', Адрес_кв = '''+Edit7.Text+''', Адрес_тел = '''+Edit8.Text+''', ');
+    sql.Add('Кл_рук_ФИО = '''+Edit9.Text+''' WHERE id = '+IntToStr(id));
+    ExecSQL;
+  end;
+  with ADOQuery1 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT * FROM tab1');
+    Open;
+  end;
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Application.Terminate;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  ADOConnection1.ConnectionString:= GetCurrentDir+'\db.mdb';
+  ADOConnection1.Connected:= true;
+  ADOQuery1.Active:= true;
+  ADOConnection2.ConnectionString:= GetCurrentDir+'\db.mdb';
+  ADOConnection2.Connected:= true;
+  ADOQuery3.Active:= true;
+end;
+
+procedure TForm1.BitBtn1Click(Sender: TObject);
+begin
+  Edit();
+end;
+
+procedure TForm1.BitBtn2Click(Sender: TObject);
+begin
+  Delete();
+end;
+
+procedure TForm1.BitBtn3Click(Sender: TObject);
+begin
+  Form2.Show;
+end;
+
+procedure TForm1.BitBtn4Click(Sender: TObject);
+begin
+  Form3.Show;
+end;
+
+procedure TForm1.BitBtn5Click(Sender: TObject);
+begin
+  Form4.Show;
+end;
+
+procedure TForm1.BitBtn20Click(Sender: TObject);
+var XL:variant; iRow:integer;
+begin
+  try
+    ADOQuery1.First;
+    XL:=CreateOleObject('Excel.Application');
+    XL.ReferenceStyle:=2;
+    XL.Workbooks.add(getcurrentdir()+'/отчет.xls');
+    XL.cells[1,1]:='Класс';
+    XL.cells[1,2]:='Буква';
+    XL.cells[1,3]:='Фамилия';
+    XL.cells[1,4]:='Имя';
+    XL.cells[1,5]:='Отчество';
+    XL.cells[1,6]:='Пол';
+    XL.cells[1,7]:='Дата рождения';
+    iRow:=2;
+    while not ADOQuery1.Eof do
+      begin
+        XL.cells[irow,1]:=ADOQuery1.FieldByName('Класс').AsString;
+        XL.cells[irow,2]:=ADOQuery1.FieldByName('Буква').AsString;
+        XL.cells[irow,3]:=ADOQuery1.FieldByName('Фамилия').AsString;
+        XL.cells[irow,4]:=ADOQuery1.FieldByName('Имя').AsString;
+        XL.cells[irow,5]:=ADOQuery1.FieldByName('Отчество').AsString;
+        XL.cells[irow,6]:=ADOQuery1.FieldByName('Пол').AsString;
+        XL.cells[irow,7]:=ADOQuery1.FieldByName('Дат_рож').AsString;
+        inc(iRow);
+        ADOQuery1.Next();
+      end;
+        XL.visible:=true;
+  except
+    MessageBox(Handle,'Таблица пуста','Ошибка', MB_OK+MB_ICONERROR);
+  end;
+end;
+
+procedure TForm1.BitBtn7Click(Sender: TObject);
+var XL:variant; iRow:integer;
+begin
+  with ADOQuery3 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT * FROM tab1');
+    Open;
+  end;
+  try
+    ADOQuery3.First;
+    XL:=CreateOleObject('Excel.Application');
+    XL.ReferenceStyle:=2;
+    XL.Workbooks.add(getcurrentdir()+'/отчет.xls');
+    XL.cells[1,1]:='Класс';
+    XL.cells[1,2]:='Буква';
+    XL.cells[1,3]:='Фамилия';
+    XL.cells[1,4]:='Имя';
+    XL.cells[1,5]:='Отчество';
+    XL.cells[1,6]:='Пол';
+    XL.cells[1,7]:='Дата рождения';
+    iRow:=2;
+    while not ADOQuery3.Eof do
+      begin
+        XL.cells[irow,1]:=ADOQuery3.FieldByName('Класс').AsString;
+        XL.cells[irow,2]:=ADOQuery3.FieldByName('Буква').AsString;
+        //XL.WorkBooks[1].Columns[1].ColumnWidth := 4.5;
+        XL.cells[irow,3]:=ADOQuery3.FieldByName('Фамилия').AsString;
+        XL.cells[irow,4]:=ADOQuery3.FieldByName('Имя').AsString;
+        XL.cells[irow,5]:=ADOQuery3.FieldByName('Отчество').AsString;
+        XL.cells[irow,6]:=ADOQuery3.FieldByName('Пол').AsString;
+        XL.cells[irow,7]:=ADOQuery3.FieldByName('Дат_рож').AsString;
+        inc(iRow);
+        ADOQuery3.Next();
+      end;
+        XL.visible:=true;
+  except
+    MessageBox(Handle,'Таблица пуста','Ошибка', MB_OK+MB_ICONERROR);
+  end;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  if OpenPictureDialog1.Execute then
+  begin
+    Jpeg:=TJPEGImage.Create;
+    Jpeg.LoadFromFile(OpenPictureDialog1.FileName);
+    DBImage1.Picture.Bitmap.Assign(Jpeg);//вот здесь его присваиваем bitmap
+    Jpeg.Free;
+    k:= true;
+  end;
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  DBImage1.Picture.Graphic:= nil;
+  k:= false;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  Form5.Edit11.Text:= DBGrid1.DataSource.DataSet.Fields[0].AsString;
+  Form5.Edit12.Text:= DBGrid1.DataSource.DataSet.Fields[1].AsString;
+  Form5.Show;
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+begin
+  if TreeView1.Visible = false then
+  begin
+    TreeView1.Visible:= true;
+    Button4.Caption:= 'Отмена';
+    DBGrid1.Width:= 426;
+    DBGrid1.Left:= 135;
+  end
+  else
+  begin
+    TreeView1.Visible:= false;
+    Button4.Caption:= 'Выбрать класс';
+    DBGrid1.Width:= 553;
+    DBGrid1.Left:= 8;
+    Button6.Hide;
+  end;
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+begin
+  with ADOQuery1 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT * FROM tab1');
+    Open;
+  end;
+end;
+
+procedure TForm1.Button6Click(Sender: TObject);
+begin
+  Form7.Show;
+  if TreeView1.Items.Item[1].Selected then
+  begin
+    Form7.Edit1.Text:= '1';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 1 а';
+  end
+  else if TreeView1.Items.Item[2].Selected then
+  begin
+    Form7.Edit1.Text:= '1';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 1 б';
+  end
+  else if TreeView1.Items.Item[4].Selected then
+  begin
+    Form7.Edit1.Text:= '2';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 2 а';
+  end
+  else if TreeView1.Items.Item[5].Selected then
+  begin
+    Form7.Edit1.Text:= '2';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 2 б';
+  end
+  else if TreeView1.Items.Item[7].Selected then
+  begin
+    Form7.Edit1.Text:= '3';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 3 а';
+  end
+  else if TreeView1.Items.Item[8].Selected then
+  begin
+    Form7.Edit1.Text:= '3';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 3 б';
+  end
+  else if TreeView1.Items.Item[10].Selected then
+  begin
+    Form7.Edit1.Text:= '4';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 4 а';
+  end
+  else if TreeView1.Items.Item[11].Selected then
+  begin
+    Form7.Edit1.Text:= '4';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 4 б';
+  end
+  else if TreeView1.Items.Item[13].Selected then
+  begin
+    Form7.Edit1.Text:= '5';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 5 а';
+  end
+  else if TreeView1.Items.Item[14].Selected then
+  begin
+    Form7.Edit1.Text:= '5';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 5 б';
+  end
+  else if TreeView1.Items.Item[16].Selected then
+  begin
+    Form7.Edit1.Text:= '6';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 6 а';
+  end
+  else if TreeView1.Items.Item[17].Selected then
+  begin
+    Form7.Edit1.Text:= '6';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 6 б';
+  end
+  else if TreeView1.Items.Item[19].Selected then
+  begin
+    Form7.Edit1.Text:= '7';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 7 а';
+  end
+  else if TreeView1.Items.Item[20].Selected then
+  begin
+    Form7.Edit1.Text:= '7';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 7 б';
+  end
+  else if TreeView1.Items.Item[22].Selected then
+  begin
+    Form7.Edit1.Text:= '8';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 8 а';
+  end
+  else if TreeView1.Items.Item[23].Selected then
+  begin
+    Form7.Edit1.Text:= '8';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 8 б';
+  end
+  else if TreeView1.Items.Item[25].Selected then
+  begin
+    Form7.Edit1.Text:= '9';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 9 а';
+  end
+  else if TreeView1.Items.Item[26].Selected then
+  begin
+    Form7.Edit1.Text:= '9';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 9 б';
+  end
+  else if TreeView1.Items.Item[28].Selected then
+  begin
+    Form7.Edit1.Text:= '10';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 10 а';
+  end
+  else if TreeView1.Items.Item[29].Selected then
+  begin
+    Form7.Edit1.Text:= '10';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 10 б';
+  end
+  else if TreeView1.Items.Item[31].Selected then
+  begin
+    Form7.Edit1.Text:= '11';
+    Form7.Edit2.Text:= 'а';
+    Form7.Caption:= 'Выдать задания 11 а';
+  end
+  else if TreeView1.Items.Item[32].Selected then
+  begin
+    Form7.Edit1.Text:= '11';
+    Form7.Edit2.Text:= 'б';
+    Form7.Caption:= 'Выдать задания 11 б';
+  end
+end;
+
+procedure TForm1.Button7Click(Sender: TObject);
+begin
+  with ADOQuery2 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT Доступ FROM Accounts WHERE Логин = '''+Form1.Edit11.Text+'''');
+    Open;
+  end;
+  if ADOQuery2.FieldByName('Доступ').AsInteger < 1 then
+  begin
+    ShowMessage('Нет доступа');
+    Exit;
+  end;
+  Form9.Show;
+end;
+
+procedure TForm1.DataSource1DataChange(Sender: TObject; Field: TField);
+begin
+  id:= DBGrid1.DataSource.DataSet.Fields[7].AsInteger;
+  ComboBox1.Text:= IntToStr(DBGrid1.DataSource.DataSet.Fields[0].AsInteger);
+  ComboBox2.Text:= DBGrid1.DataSource.DataSet.Fields[1].AsString;
+  ComboBox3.Text:= DBGrid1.DataSource.DataSet.Fields[5].AsString;
+  Edit1.Text:= DBGrid1.DataSource.DataSet.Fields[2].AsString;
+  Edit2.Text:= DBGrid1.DataSource.DataSet.Fields[3].AsString;
+  Edit3.Text:= DBGrid1.DataSource.DataSet.Fields[4].AsString;
+  Edit10.Text:= DBGrid1.DataSource.DataSet.Fields[6].AsString;
+  with ADOQuery2 do
+  begin
+    Close;
+    sql.Clear;
+    sql.Add('SELECT * FROM tab2 WHERE id = '+IntToStr(id));
+    Open;
+  end;
+  Edit4.Text:= ADOQuery2.FieldByName('Нац').AsString;
+  Edit5.Text:= ADOQuery2.FieldByName('Адрес_ул').AsString;
+  Edit6.Text:= ADOQuery2.FieldByName('Адрес_дом').AsString;
+  Edit7.Text:= ADOQuery2.FieldByName('Адрес_кв').AsString;
+  Edit8.Text:= ADOQuery2.FieldByName('Адрес_тел').AsString;
+  Edit9.Text:= ADOQuery2.FieldByName('Кл_рук_ФИО').AsString;
+  k:= false;
+end;
+
+procedure TForm1.DBGrid1TitleClick(Column: TColumn);
+begin
+  if Column.Title.Caption = s then
+  begin
+    if s1 = ' DESC' then s1:= ''
+    else s1:= ' DESC';
+  end
+  else s:= Column.Title.Caption;
+  with ADOQuery1 do
+  begin
+    ADOQuery1.Sort:= Column.Title.Caption+s1;
+  end;
+end;
+
+procedure TForm1.N10Click(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TForm1.N2Click(Sender: TObject);
+begin
+  Form2.Show;
+end;
+
+procedure TForm1.N3Click(Sender: TObject);
+begin
+  Edit();
+end;
+
+procedure TForm1.N4Click(Sender: TObject);
+begin
+  Delete();
+end;
+
+procedure TForm1.N6Click(Sender: TObject);
+begin
+  Form3.Show;
+end;
+
+procedure TForm1.N7Click(Sender: TObject);
+begin
+  Form4.Show;
+end;
+
+procedure TForm1.N9Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    ADOConnection1.Connected:= false;
+    ADOConnection1.ConnectionString:= OpenDialog1.FileName;
+    ADOConnection1.Connected:= true;
+    ADOQuery1.Active:= true;
+  end;
+end;
+
+procedure TForm1.ToolButton1Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    ADOConnection1.Connected:= false;
+    ADOConnection1.ConnectionString:= OpenDialog1.FileName;
+    ADOConnection1.Connected:= true;
+    ADOQuery1.Active:= true;
+  end;
+end;
+
+procedure TForm1.ToolButton2Click(Sender: TObject);
+begin
+  Form2.Show;
+end;
+
+procedure TForm1.ToolButton3Click(Sender: TObject);
+begin
+  Edit();
+end;
+
+procedure TForm1.ToolButton4Click(Sender: TObject);
+begin
+  Delete();
+end;
+
+procedure TForm1.ToolButton5Click(Sender: TObject);
+begin
+  Form4.Show;
+end;
+
+procedure TForm1.ToolButton6Click(Sender: TObject);
+begin
+  Form3.Show;
+end;
+
+procedure TForm1.ToolButton7Click(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
+begin
+  with ADOQuery1 do
+  begin
+    if TreeView1.Items.Item[1].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "1" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[2].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "1" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[4].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "2" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[5].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "2" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[7].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "3" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[8].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "3" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[10].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "4" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[11].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "4" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[13].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "5" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[14].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "5" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[16].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "6" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[17].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "6" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[19].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "7" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[20].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "7" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[22].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "8" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[23].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "8" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[25].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "9" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[26].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "9" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[28].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "10" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[29].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "10" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[31].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "11" AND Буква = "а"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end
+    else if TreeView1.Items.Item[32].Selected then
+    begin
+     try
+      Close;
+      sql.Clear;
+      sql.Add('SELECT * FROM tab1 WHERE Класс = "11" AND Буква = "б"');
+      Open;
+      Button6.Show;
+     except
+        Close;
+        sql.Clear;
+        sql.Add('SELECT * FROM tab1');
+        Open;
+        ShowMessage('Подходящих записей нет');
+     end;
+    end;
+  end;
+end;
+procedure TForm1.ЗаданияClick(Sender: TObject);
+begin
+  Form7.Show;
+end;
+
+end.
